@@ -23,7 +23,7 @@ const calibrationValue = (line: string): number => {
 const sum = (numbers: number[]): number =>
   numbers.reduce((acc, el) => acc + el, 0);
 
-const digitizeLine = (line: string): string =>
+const addDigitsToLine = (line: string): string =>
   Object.keys(DIGITS).reduce(
     (acc, word) => acc.replaceAll(word, word + DIGITS[word] + word),
     line
@@ -45,7 +45,7 @@ const part1 = (resourceName: string) => {
 const part2 = (resourceName: string) => {
   const input = readFileSync("./resources/" + resourceName).toString();
   const input_lines = lines(input);
-  const lines_replaced = input_lines.map(digitizeLine);
+  const lines_replaced = input_lines.map(addDigitsToLine);
   const calibration_values = lines_replaced.map(calibrationValue);
   const calibration_values_sum = sum(calibration_values);
   return calibration_values_sum;
