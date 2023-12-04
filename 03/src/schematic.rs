@@ -97,8 +97,49 @@ impl Schematic {
     }
 
     pub fn sum_of_part_numbers(&self) -> u32 {
-        (0..=self.len())
+        (0..self.len())
             .flat_map(|i_row| self.part_numbers_in_row(i_row))
+            .sum()
+    }
+
+    fn gear_indices_in_row(&self, row: usize) -> Vec<usize> {
+        let Some(r) = self.0.get(row) else {
+            return Vec::new();
+        };
+        r.iter()
+            .enumerate()
+            .filter(|(_, coord)| matches!(coord, Coordinate::Symbol('*')))
+            .map(|tuple| tuple.0)
+            .collect()
+    }
+
+    fn gear_ratios_in_row(&self, row: usize) -> Vec<u32> {
+        let numbers_with_pos_in_surrounding_rows: Vec<(usize, usize, u32)> = (row.saturating_sub(1)
+            ..=row + 1)
+            .flat_map(|r| self.numbers_with_pos_in_row(r))
+            .collect();
+        self.gear_indices_in_row(row)
+            .iter()
+            .filter_map(|i_gear| {
+                let neighbouring_numbers: Vec<(usize, usize, u32)> =
+                    numbers_with_pos_in_surrounding_rows
+                        .clone()
+                        .into_iter()
+                        .filter(|(i_start, i_end, _)| {
+                            (i_start.saturating_sub(1)..=i_end.add(1)).contains(i_gear)
+                        })
+                        .collect();
+                match neighbouring_numbers[..] {
+                    [(_, _, num_a), (_, _, num_b)] => Some(num_a * num_b),
+                    _ => None,
+                }
+            })
+            .collect()
+    }
+
+    pub fn sum_of_gear_ratios(&self) -> u32 {
+        (0..self.len())
+            .flat_map(|row| self.gear_ratios_in_row(row))
             .sum()
     }
 }
