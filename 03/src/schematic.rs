@@ -32,10 +32,6 @@ impl Schematic {
         }
     }
 
-    fn get(&self, row: usize, col: usize) -> Option<&Coordinate> {
-        self.0.get(row).and_then(|r| r.get(col))
-    }
-
     fn surrounding_symbol_indices(&self, row: usize) -> HashSet<usize> {
         (row.saturating_sub(1)..=row + 1)
             .flat_map(|r| {
