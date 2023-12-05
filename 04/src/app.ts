@@ -47,8 +47,8 @@ const part2 = (input: string) => {
   const allCards = parseInput(input),
     cardsForCard = (card: Card): number => {
       const { index, intersection } = card,
-        cardsFromThisCard = intersection.length,
-        extraCards = allCards.slice(index, index + cardsFromThisCard),
+        cardsFromCard = intersection.length,
+        extraCards = allCards.slice(index, index + cardsFromCard),
         cardsFromExtraCards = sum(extraCards.map(cardsForCard));
       return 1 + cardsFromExtraCards;
     };
