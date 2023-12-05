@@ -43,3 +43,16 @@ console.log(`Part 1 answers`);
 /*
  * Part 2
  */
+const part2 = (input: string) => {
+  const allCards = parseInput(input),
+    cardsForCard = (card: Card): number => {
+      const { index, intersection } = card,
+        cardsFromThisCard = intersection.length,
+        extraCards = allCards.slice(index, index + cardsFromThisCard),
+        cardsFromExtraCards = sum(extraCards.map(cardsForCard));
+      return 1 + cardsFromExtraCards;
+    };
+  return sum(allCards.map(cardsForCard));
+};
+console.log(`Part 2 answers`);
+[example, input].forEach((file) => console.log(part2(file)));
