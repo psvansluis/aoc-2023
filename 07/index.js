@@ -1,9 +1,11 @@
 //@ts-check
 
-function add(a, b) {
-  return a + b;
-}
+const fs = require("fs");
+const Game = require("./lib-07/game");
+/* 07 */
 
-console.log(add(7, 8));
+const example = fs.readFileSync("./resources-07/example.txt").toString();
+const input = fs.readFileSync("./resources-07/input.txt").toString();
 
-module.exports = add;
+console.log(new Game(example).totalWinnings);
+console.log(new Game(input).totalWinnings);
