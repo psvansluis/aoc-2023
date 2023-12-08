@@ -1,11 +1,14 @@
+{-# LANGUAGE OverloadedRecordDot #-}
 module Network (
-    solvePart1
+    solvePart1,
+    solvePart2
 ) where
 
-import Parse (Network (..), network, Direction, directions, nodes, left, right)
+import Parse (Network (..), network, Direction, directions, nodes, l)
 
-import Data.Map (Map, (!))
+import Data.Map (Map, (!), keys)
 
+-- Part 1
 solvePart1 :: Network -> Integer
 solvePart1 nw = answer
     where 
@@ -14,18 +17,31 @@ solvePart1 nw = answer
         first = (nw, "AAA", 0)
 
 doStep :: (Network, String, Integer) -> (Network, String, Integer)
-doStep (currNetwork, currPos, currI) = 
-    (nextNetwork, nextPos, nextI)
+doStep (currNetwork, currPos, currI) = (nextNetwork, nextPos, nextI)
     where 
-        nextNetwork = network (tail $ directions currNetwork) (nodes currNetwork)
-        currDirection = head $ directions currNetwork
-        nextPos = takeDirection (nodes currNetwork) currDirection currPos
+        (dir: dirs) = currNetwork.directions
+        nextNetwork = network dirs currNetwork.nodes
+        nextPos = takeDirection currNetwork.nodes dir currPos
         nextI = currI + 1
 
 
 takeDirection :: Map String (String, String) -> Direction -> String -> String
-takeDirection nodes' dir key = if dir == left then lhs else rhs
+takeDirection nodes' dir key = if dir == l then lhs else rhs
     where 
         (lhs, rhs) = nodes' ! key
 
     
+-- Part 2
+solvePart2 :: Network -> Integer
+solvePart2 nw = answer
+    where
+        answer = foldl1 Prelude.lcm listOfStepsNeeded
+        listOfStepsNeeded = map stepsToSolve firsts
+        firsts = map (\pos -> (nw, pos, 0)) $ nodesInA nw
+        endsInZ (_,str,_) = last str == 'Z'
+        stepsToSolve first = steps where (_, _, steps) = until endsInZ doStep first
+
+nodesInA :: Network -> [String]
+nodesInA nw = filter (\key -> last key == 'A') $ keys nw.nodes 
+
+

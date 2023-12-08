@@ -7,22 +7,22 @@ module Parse (
     network,
     directions,
     nodes,
-    left,
-    right
+    l,
+    r
 ) where 
 
 import Data.Maybe (mapMaybe)
-import Data.Char (isUpper)
+import Data.Char (isAlphaNum)
 import Data.Map (Map, fromList)
 
 data Direction = L | R deriving (Eq, Show)
 data Network = Network {directions:: [Direction], nodes:: Map String (String, String)} deriving (Eq, Show)
 
-left :: Direction
-left = L
+l :: Direction
+l = L
 
-right :: Direction
-right = R
+r :: Direction
+r = R
 
 network :: [Direction] -> Map String (String, String) -> Network
 network directions nodes = Network{directions, nodes}
@@ -38,7 +38,7 @@ parseDirection _ = Nothing
 parseNode :: String -> (String, (String, String))
 parseNode str = let
     spl ch = span (/= ch)
-    clean = filter isUpper 
+    clean = filter isAlphaNum
     (origin, targets) = spl '=' str
     (left, right) = spl ',' targets
         in
