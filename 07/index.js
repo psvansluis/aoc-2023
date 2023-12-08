@@ -7,5 +7,10 @@ const Game = require("./lib-07/game");
 const example = fs.readFileSync("./resources-07/example.txt").toString();
 const input = fs.readFileSync("./resources-07/input.txt").toString();
 
-console.log(new Game(example).totalWinnings);
-console.log(new Game(input).totalWinnings);
+// part 1
+console.log(new Game(example, "jack").totalWinnings);
+console.log(new Game(input, "jack").totalWinnings);
+
+// part 2
+console.log(new Game(example, "joker").totalWinnings);
+console.log(new Game(input, "joker").totalWinnings);
