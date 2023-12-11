@@ -5,7 +5,7 @@ type Lines = Vec<Vec<i32>>;
 // reading and parsing
 fn read_line(line: &str) -> Vec<i32> {
     line.split_ascii_whitespace()
-        .map(|num| num.parse::<i32>().unwrap())
+        .map(|num| num.parse().unwrap())
         .collect()
 }
 
@@ -23,18 +23,14 @@ enum Time {
 }
 // actual analysis
 fn next_in_sequence(sequence: &[i32], direction: &Time) -> i32 {
-    let diffs = differences(sequence);
-    let to_add = if diffs.iter().all(|n| n == &0) {
-        0
-    } else {
-        next_in_sequence(&diffs, direction)
+    let delta = match differences(sequence) {
+        diffs if diffs.iter().all(|n| n == &0) => 0,
+        diffs => next_in_sequence(&diffs, direction),
     };
-
-    let (this, remainder) = match direction {
-        Time::Future => (sequence.last(), to_add),
-        Time::Past => (sequence.first(), -to_add),
-    };
-    this.unwrap() + remainder
+    match direction {
+        Time::Future => sequence.last().unwrap() + delta,
+        Time::Past => sequence.first().unwrap() - delta,
+    }
 }
 
 fn differences(sequence: &[i32]) -> Vec<i32> {
