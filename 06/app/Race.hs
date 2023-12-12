@@ -35,5 +35,5 @@ firstSpeedToBeat iter Race {time, distance}  = fromJust $ find beats iter
 countWaysToBeat :: Race -> Int
 countWaysToBeat race = max 0 (maxSpeed - minSpeed + 1)
     where
-        minSpeed = firstSpeedToBeat [1..] race
-        maxSpeed = firstSpeedToBeat [time race, time race - 1 ..] race
+        minSpeed = firstSpeedToBeat [1 .. time race] race
+        maxSpeed = firstSpeedToBeat [time race, time race - 1 .. 1] race
