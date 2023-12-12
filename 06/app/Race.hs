@@ -1,23 +1,30 @@
 module Race (
-    parse, 
-    Race,
+    parseRaces, 
+    parseRace,
     countWaysToBeat
 ) where
 
 import Data.Maybe (mapMaybe, fromJust)
 import Text.Read (readMaybe)
 import Data.List (find)
+import Data.Char (isDigit)
 
 data Race = Race {time :: Int, distance :: Int} deriving (Show)
 
-parse :: String -> [Race]
-parse str = map toRace pairs
+parseRaces :: String -> [Race]
+parseRaces str = map toRace pairs
     where
         [timeLine, distanceLine] = lines str
         times = mapMaybe readMaybe $ words timeLine
         distances = mapMaybe readMaybe (words distanceLine)
         pairs = zip times distances
         toRace (time, distance) = Race {time, distance}
+
+parseRace :: String -> Race
+parseRace str = Race {time, distance}
+    where
+        [time, distance] = map bigNum $ lines str
+        bigNum line = read $ filter isDigit line
 
 getDistance :: Int -> Int -> Int
 getDistance time speed = (time - speed) * speed
