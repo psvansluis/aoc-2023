@@ -3,6 +3,7 @@ use std::fs;
 
 pub mod avalanche;
 pub mod part;
+pub mod part_range;
 pub mod workflow;
 
 fn main() {
@@ -10,4 +11,5 @@ fn main() {
     let avalanche = Avalanche::parse(&text);
     // dbg!(avalanche);
     dbg!(avalanche.sum_of_parts());
+    dbg!(avalanche.accepted_combinations_of_ratings());
 }

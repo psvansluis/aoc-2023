@@ -1,4 +1,9 @@
-use crate::part::Part;
+use std::cmp::{max, min};
+
+use crate::{
+    part::Part,
+    part_range::{FieldRange, PartRange},
+};
 
 #[derive(Debug)]
 pub enum Destination {
@@ -29,7 +34,7 @@ struct Rule {
     destination: Destination,
 }
 #[derive(Debug)]
-enum Category {
+pub enum Category {
     X,
     M,
     A,
@@ -76,6 +81,59 @@ impl Rule {
         };
         op(part_value, self.limit)
     }
+
+    fn apply_to_part_range(&self, part_range: &PartRange) -> (PartRange, PartRange) {
+        let lim = self.limit as u64;
+        let range_to_split = match self.category {
+            Category::X => part_range.x,
+            Category::M => part_range.m,
+            Category::A => part_range.a,
+            Category::S => part_range.s,
+        };
+        let (accepted, rejected): (FieldRange, FieldRange) = match self.condition {
+            Condition::Greater => (
+                FieldRange {
+                    start: max(range_to_split.start, lim + 1),
+                    ..range_to_split
+                },
+                FieldRange {
+                    end: min(range_to_split.end, lim),
+                    ..range_to_split
+                },
+            ),
+            Condition::Less => (
+                FieldRange {
+                    end: min(range_to_split.end, lim - 1),
+                    ..range_to_split
+                },
+                FieldRange {
+                    start: max(range_to_split.start, lim),
+                    ..range_to_split
+                },
+            ),
+        };
+        let new_part_range = |field_range: &FieldRange| -> PartRange {
+            match self.category {
+                Category::X => PartRange {
+                    x: *field_range,
+                    ..*part_range
+                },
+                Category::M => PartRange {
+                    m: *field_range,
+                    ..*part_range
+                },
+                Category::A => PartRange {
+                    a: *field_range,
+                    ..*part_range
+                },
+                Category::S => PartRange {
+                    s: *field_range,
+                    ..*part_range
+                },
+            }
+        };
+        (new_part_range(&accepted), new_part_range(&rejected))
+    }
 }
 
 #[derive(Debug)]
@@ -98,5 +156,17 @@ impl Workflow {
             .iter()
             .find(|rule| rule.is_satisfied(part))
             .map_or(&self.otherwise, |rule| &rule.destination)
+    }
+
+    pub fn apply_range(&self, part_range: &PartRange) -> Vec<(PartRange, &Destination)> {
+        let mut out = Vec::new();
+        let mut next_part_range = *part_range;
+        for rule in &self.rules {
+            let (first, second) = rule.apply_to_part_range(&next_part_range);
+            out.push((first, &rule.destination));
+            next_part_range = second;
+        }
+        out.push((next_part_range, &self.otherwise));
+        out
     }
 }
